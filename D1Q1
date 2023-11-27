@@ -1,0 +1,62 @@
+#include <stdio.h>
+
+void findWaitingTurnaroundTime(int processes[], int n, int bt[]) {
+    int wt[n], tat[n];
+
+    wt[0] = 0;
+    tat[0] = bt[0];
+
+    // Calculate waiting time and turnaround time for each process
+    for (int i = 1; i < n; i++) {
+        wt[i] = wt[i - 1] + bt[i - 1];
+        tat[i] = tat[i - 1] + bt[i];
+    }
+
+    // Calculate average waiting time and average turnaround time
+    float total_wt = 0, total_tat = 0;
+    for (int i = 0; i < n; i++) {
+        total_wt += wt[i];
+        total_tat += tat[i];
+    }
+
+    float avg_wt = total_wt / n;
+    float avg_tat = total_tat / n;
+
+    // Print results
+    printf("Average Waiting Time: %f\n", avg_wt);
+    printf("Average Turnaround Time: %f\n", avg_tat);
+}
+
+void findAverageTimes(int processes[], int n, int bt[]) {
+    // Sort processes based on burst time using Bubble Sort
+    for (int i = 0; i < n - 1; i++) {
+        for (int j = 0; j < n - i - 1; j++) {
+            if (bt[j] > bt[j + 1]) {
+                // Swap burst times
+                int temp = bt[j];
+                bt[j] = bt[j + 1];
+                bt[j + 1] = temp;
+
+                // Swap processes
+                temp = processes[j];
+                processes[j] = processes[j + 1];
+                processes[j + 1] = temp;
+            }
+        }
+    }
+
+    // Find waiting time and turnaround time
+    findWaitingTurnaroundTime(processes, n, bt);
+}
+
+int main() {
+    // Example processes and burst times
+    int processes[] = {1, 2, 3, 4};
+    int burst_time[] = {6, 8, 7, 3};
+    int num_processes = sizeof(processes) / sizeof(processes[0]);
+
+    // Find average waiting time and average turnaround time
+    findAverageTimes(processes, num_processes, burst_time);
+
+    return 0;
+}                                      
