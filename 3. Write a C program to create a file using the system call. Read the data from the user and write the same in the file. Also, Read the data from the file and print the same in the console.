@@ -1,0 +1,61 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <fcntl.h>
+#include <unistd.h>
+
+#define MAX_BUFFER_SIZE 100
+
+int main() {
+    int fileDescriptor;
+    char fileName[] = "example_file.txt";
+    char buffer[MAX_BUFFER_SIZE];
+
+    // Open the file in write-only mode, creating it if it doesn't exist
+    fileDescriptor = open(fileName, O_WRONLY | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR);
+    
+    if (fileDescriptor == -1) {
+        perror("Error opening file");
+        exit(EXIT_FAILURE);
+    }
+
+    // Get data from the user
+    printf("Enter data to write to the file (max %d characters):\n", MAX_BUFFER_SIZE);
+    fgets(buffer, MAX_BUFFER_SIZE, stdin);
+
+    // Write data to the file
+    if (write(fileDescriptor, buffer, strlen(buffer)) == -1) {
+        perror("Error writing to file");
+        close(fileDescriptor);
+        exit(EXIT_FAILURE);
+    }
+
+    // Close the file
+    close(fileDescriptor);
+
+    // Open the file in read-only mode
+    fileDescriptor = open(fileName, O_RDONLY);
+
+    if (fileDescriptor == -1) {
+        perror("Error opening file for reading");
+        exit(EXIT_FAILURE);
+    }
+
+    // Read data from the file and print to console
+    printf("\nReading data from file:\n");
+
+    ssize_t bytesRead;
+    while ((bytesRead = read(fileDescriptor, buffer, sizeof(buffer))) > 0) {
+        write(STDOUT_FILENO, buffer, bytesRead);
+    }
+
+    if (bytesRead == -1) {
+        perror("Error reading from file");
+        close(fileDescriptor);
+        exit(EXIT_FAILURE);
+    }
+
+    // Close the file
+    close(fileDescriptor);
+
+    return 0;
+}
