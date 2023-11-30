@@ -1,0 +1,68 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/wait.h>
+
+// Function to check if a number is prime
+int isPrime(int num) {
+    if (num <= 1) {
+        return 0; // Not prime
+    }
+    for (int i = 2; i * i <= num; ++i) {
+        if (num % i == 0) {
+            return 0; // Not prime
+        }
+    }
+    return 1; // Prime
+}
+
+// Function to generate Fibonacci series
+void generateFibonacci(int n) {
+    int prev = 0, current = 1, next;
+    
+    printf("Fibonacci Series: ");
+    
+    for (int i = 0; i < n; ++i) {
+        printf("%d ", prev);
+        next = prev + current;
+        prev = current;
+        current = next;
+    }
+    printf("\n");
+}
+
+int main() {
+    pid_t pid;
+    int status;
+
+    // Create a child process
+    pid = fork();
+
+    if (pid < 0) {
+        perror("Fork failed");
+        exit(EXIT_FAILURE);
+    } else if (pid == 0) {
+        // Child process
+        printf("Child process (PID: %d) generating Fibonacci series...\n", getpid());
+        generateFibonacci(10); // Change 10 to the desired number of Fibonacci series elements
+    } else {
+        // Parent process
+        printf("Parent process (PID: %d) waiting for the child...\n", getpid());
+        wait(&status); // Wait for the child process to finish
+
+        if (WIFEXITED(status)) {
+            printf("Child process exited with status %d\n", WEXITSTATUS(status));
+        }
+
+        // Print prime numbers in the parent process
+        printf("Prime Numbers: ");
+        for (int i = 2; i <= 20; ++i) {
+            if (isPrime(i)) {
+                printf("%d ", i);
+            }
+        }
+        printf("\n");
+    }
+
+    return 0;
+}
