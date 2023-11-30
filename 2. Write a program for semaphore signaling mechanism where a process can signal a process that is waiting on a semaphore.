@@ -1,0 +1,67 @@
+#include <stdio.h>
+#include <pthread.h>
+#include <semaphore.h>
+
+// Define semaphore and initialize it to the number of instances (4 in this case)
+sem_t semaphore;
+int resource = 0; // Shared resource
+
+// Function to simulate processes waiting on the semaphore
+void* process(void* arg) {
+    int process_id = *((int*)arg);
+    
+    printf("Process P%d waiting on semaphore\n", process_id);
+    
+    // Wait operation
+    sem_wait(&semaphore);
+    
+    // Critical Section
+    printf("Process P%d entered critical section and acquired the resource\n", process_id);
+    resource++;
+    printf("Resource value: %d\n", resource);
+    
+    // Signal the semaphore to release it for other processes
+    sem_post(&semaphore);
+    
+    return NULL;
+}
+
+int main() {
+    // Initialize semaphore with 4 instances
+    sem_init(&semaphore, 0, 4);
+
+    // Create thread identifiers for processes
+    pthread_t threads[4];
+
+    // Process IDs
+    int process_ids[] = {1, 2, 3, 4};
+
+    // Create threads for processes
+    for (int i = 0; i < 4; ++i) {
+        pthread_create(&threads[i], NULL, process, (void*)&process_ids[i]);
+    }
+
+    // Wait for all threads to finish
+    for (int i = 0; i < 4; ++i) {
+        pthread_join(threads[i], NULL);
+    }
+
+    // Additional process P5 trying to access the resource
+    printf("\nProcess P5 trying to access the resource\n");
+    
+    // Wait operation for P5
+    sem_wait(&semaphore);
+    
+    // Critical Section for P5
+    printf("Process P5 entered critical section and acquired the resource\n");
+    resource++;
+    printf("Resource value: %d\n", resource);
+    
+    // Signal the semaphore to release it for other processes
+    sem_post(&semaphore);
+
+    // Destroy the semaphore
+    sem_destroy(&semaphore);
+
+    return 0;
+}
