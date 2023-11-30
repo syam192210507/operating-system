@@ -1,0 +1,49 @@
+#include <stdio.h>
+
+// Function to calculate disk I/O operations for contiguous allocation
+int contiguousAllocation(int currentBlocks, int newBlock) {
+    if (newBlock < currentBlocks) {
+        return 1; // Disk I/O for updating the file control block
+    } else {
+        return 2; // Disk I/O for updating the file control block and allocating new block
+    }
+}
+
+// Function to calculate disk I/O operations for linked allocation
+int linkedAllocation(int currentBlocks, int newBlock) {
+    return 2; // Disk I/O for updating the file control block and allocating new block
+}
+
+// Function to calculate disk I/O operations for indexed allocation
+int indexedAllocation(int currentBlocks, int newBlock) {
+    if (newBlock < currentBlocks) {
+        return 1; // Disk I/O for updating the index block
+    } else {
+        return 2; // Disk I/O for updating the index block and allocating new block
+    }
+}
+
+int main() {
+    int currentBlocks = 100;
+    int newBlock;
+
+    // Test Case: Block added at the beginning
+    newBlock = 1;
+    printf("Contiguous Allocation - Beginning: %d disk I/O operations\n", contiguousAllocation(currentBlocks, newBlock));
+    printf("Linked Allocation - Beginning: %d disk I/O operations\n", linkedAllocation(currentBlocks, newBlock));
+    printf("Indexed Allocation - Beginning: %d disk I/O operations\n", indexedAllocation(currentBlocks, newBlock));
+
+    // Test Case: Block added in the middle
+    newBlock = currentBlocks / 2;
+    printf("Contiguous Allocation - Middle: %d disk I/O operations\n", contiguousAllocation(currentBlocks, newBlock));
+    printf("Linked Allocation - Middle: %d disk I/O operations\n", linkedAllocation(currentBlocks, newBlock));
+    printf("Indexed Allocation - Middle: %d disk I/O operations\n", indexedAllocation(currentBlocks, newBlock));
+
+    // Test Case: Block added at the end
+    newBlock = currentBlocks + 1;
+    printf("Contiguous Allocation - End: %d disk I/O operations\n", contiguousAllocation(currentBlocks, newBlock));
+    printf("Linked Allocation - End: %d disk I/O operations\n", linkedAllocation(currentBlocks, newBlock));
+    printf("Indexed Allocation - End: %d disk I/O operations\n", indexedAllocation(currentBlocks, newBlock));
+
+    return 0;
+}
